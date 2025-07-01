@@ -225,7 +225,7 @@ body {
   margin-right: auto;
 }
 
-/* Header with back button */
+
 .header {
   display: flex;
   justify-content: space-between;
@@ -254,7 +254,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive Design */
+
 @media (max-width: 768px) {
   .title {
     font-size: 32px;
@@ -344,13 +344,13 @@ body {
   }
 }
 
-/* Game Container Animation */
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Floating animation for game buttons */
+
 .image-button:nth-child(1) { animation-delay: 0s; }
 .image-button:nth-child(2) { animation-delay: 0.5s; }
 .image-button:nth-child(3) { animation-delay: 1s; }
@@ -360,7 +360,7 @@ body {
   50% { transform: translateY(-5px); }
 }
 
-/* Footer Styling */
+
 .footer {
   margin-top: 50px;
   padding: 20px 0;

@@ -109,7 +109,7 @@ function playGame(playerMove) {
   
   resultElement.textContent = result;
   resultElement.style.animation = 'none';
-  resultElement.offsetHeight; // Trigger reflow
+  resultElement.offsetHeight; 
   resultElement.style.animation = 'pulse 0.5s ease-in-out';
 
   movesElement.innerHTML = `
@@ -120,7 +120,7 @@ function playGame(playerMove) {
     <strong>Computer's Move</strong>
   `;
   movesElement.style.animation = 'none';
-  movesElement.offsetHeight; // Trigger reflow
+  movesElement.offsetHeight; 
   movesElement.style.animation = 'fadeIn 0.5s ease-in';
 }
 
@@ -158,7 +158,7 @@ function showScoreBreakdown() {
     document.querySelector('.js-score-breakdown').textContent = 'No games played yet.';
     return;
   }
-  // Computer's score is player's losses
+  
   document.querySelector('.js-score-breakdown').innerHTML = `
     Total Games Played: <strong>${totalGames}</strong><br />
     Your Wins: <strong>${score.wins}</strong><br />
@@ -188,7 +188,7 @@ function capitalize(word) {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
-// Navigation function
+
 function goHome() {
   window.location.href = 'index.html';
 }

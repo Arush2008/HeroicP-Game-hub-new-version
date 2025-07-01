@@ -1,14 +1,11 @@
-// Doodle Jump Game Logic
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Game variables
-let gameState = 'start'; // 'start', 'playing', 'gameOver'
+let gameState = 'start';
 let score = 0;
 let highScore = localStorage.getItem('doodleJumpHighScore') || 0;
 let cameraY = 0;
 
-// Doodle character
 const doodle = {
   x: canvas.width / 2 - 15,
   y: canvas.height - 150,
@@ -21,26 +18,22 @@ const doodle = {
   color: '#FFD700'
 };
 
-// Platforms array
 let platforms = [];
 const platformWidth = 70;
 const platformHeight = 15;
 
-// Game physics
 const gravity = 0.6;
 const keys = {};
 
-// Initialize game
 function init() {
   updateHighScoreDisplay();
   generateInitialPlatforms();
   gameLoop();
   
-  // Event listeners
   document.addEventListener('keydown', (e) => {
     keys[e.key.toLowerCase()] = true;
     
-    // Handle Space key for starting/restarting
+    
     if (e.code === 'Space') {
       e.preventDefault();
       if (gameState === 'start') {
@@ -55,7 +48,7 @@ function init() {
     keys[e.key.toLowerCase()] = false;
   });
   
-  // Add click event for starting/restarting the game
+  
   canvas.addEventListener('click', (e) => {
     if (gameState === 'start') {
       startGame();
@@ -68,14 +61,14 @@ function init() {
 function generateInitialPlatforms() {
   platforms = [];
   
-  // Starting platform
+  
   platforms.push({
     x: canvas.width / 2 - platformWidth / 2,
     y: canvas.height - 100,
     type: 'normal'
   });
   
-  // Generate platforms going up
+  
   for (let i = 1; i < 15; i++) {
     platforms.push({
       x: Math.random() * (canvas.width - platformWidth),
@@ -142,26 +135,26 @@ function updateGame() {
   
   handleInput();
   
-  // Update doodle position
+  
   doodle.x += doodle.velocityX;
   doodle.velocityY += gravity;
   doodle.y += doodle.velocityY;
   
-  // Wrap around screen horizontally
+  
   if (doodle.x < -doodle.width) {
     doodle.x = canvas.width;
   } else if (doodle.x > canvas.width) {
     doodle.x = -doodle.width;
   }
   
-  // Update camera when doodle goes up
+  
   if (doodle.y < canvas.height / 2 + cameraY) {
     cameraY = doodle.y - canvas.height / 2;
     score = Math.max(score, Math.floor(-cameraY / 10));
     updateScore();
   }
   
-  // Update moving platforms
+  
   platforms.forEach(platform => {
     if (platform.type === 'moving') {
       platform.x += platform.direction * platform.speed;
@@ -171,25 +164,25 @@ function updateGame() {
     }
   });
   
-  // Generate new platforms as we go higher
+  
   while (platforms.length < 20) {
     generateNewPlatforms();
   }
   
-  // Remove platforms that are too far below
+  
   platforms = platforms.filter(platform => platform.y < doodle.y + canvas.height);
   
-  // Check platform collisions
+  
   checkPlatformCollisions();
   
-  // Check game over
+  
   if (doodle.y > cameraY + canvas.height + 100) {
     gameOver();
   }
 }
 
 function checkPlatformCollisions() {
-  if (doodle.velocityY > 0) { // Only check when falling
+  if (doodle.velocityY > 0) { 
     platforms.forEach(platform => {
       if (doodle.x < platform.x + platformWidth &&
           doodle.x + doodle.width > platform.x &&
@@ -204,27 +197,27 @@ function checkPlatformCollisions() {
 function gameOver() {
   gameState = 'gameOver';
   
-  // Update high score
+  
   if (score > highScore) {
     highScore = score;
     localStorage.setItem('doodleJumpHighScore', highScore);
   }
   
-  // Show game over screen
+  
   document.getElementById('finalScore').textContent = score;
   document.getElementById('finalHighScore').textContent = highScore;
   document.getElementById('gameOver').style.display = 'block';
 }
 
 function drawGame() {
-  // Clear canvas
+  
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  // Save context for camera transform
+  
   ctx.save();
   ctx.translate(0, -cameraY);
   
-  // Draw background gradient
+  
   const gradient = ctx.createLinearGradient(0, cameraY, 0, cameraY + canvas.height);
   gradient.addColorStop(0, '#87CEEB');
   gradient.addColorStop(0.5, '#B0E0E6');
@@ -232,43 +225,43 @@ function drawGame() {
   ctx.fillStyle = gradient;
   ctx.fillRect(0, cameraY, canvas.width, canvas.height);
   
-  // Draw platforms
+  
   platforms.forEach(platform => {
     if (platform.y > cameraY - 50 && platform.y < cameraY + canvas.height + 50) {
-      // Platform color based on type
+      
       if (platform.type === 'moving') {
         ctx.fillStyle = '#FF69B4';
       } else {
         ctx.fillStyle = '#32CD32';
       }
       
-      // Draw platform
+      
       ctx.fillRect(platform.x, platform.y, platformWidth, platformHeight);
       
-      // Platform border
+      
       ctx.strokeStyle = '#228B22';
       ctx.lineWidth = 2;
       ctx.strokeRect(platform.x, platform.y, platformWidth, platformHeight);
     }
   });
   
-  // Draw doodle
+  
   ctx.fillStyle = doodle.color;
   ctx.fillRect(doodle.x, doodle.y, doodle.width, doodle.height);
   
-  // Doodle face
-  ctx.fillStyle = 'black';
-  ctx.fillRect(doodle.x + 8, doodle.y + 8, 3, 3); // Left eye
-  ctx.fillRect(doodle.x + 19, doodle.y + 8, 3, 3); // Right eye
   
-  // Doodle smile
+  ctx.fillStyle = 'black';
+  ctx.fillRect(doodle.x + 8, doodle.y + 8, 3, 3); 
+  ctx.fillRect(doodle.x + 19, doodle.y + 8, 3, 3); 
+  
+  
   ctx.beginPath();
   ctx.arc(doodle.x + 15, doodle.y + 20, 5, 0, Math.PI);
   ctx.lineWidth = 2;
   ctx.strokeStyle = 'black';
   ctx.stroke();
   
-  // Restore context
+  
   ctx.restore();
 }
 
@@ -290,5 +283,5 @@ function goHome() {
   window.location.href = 'index.html';
 }
 
-// Initialize game when page loads
+
 document.addEventListener('DOMContentLoaded', init);

@@ -1,4 +1,3 @@
-// Games Hub JavaScript
 function playGame(gameType) {
   switch(gameType) {
     case 'rock-paper-scissors':
@@ -15,12 +14,10 @@ function playGame(gameType) {
   }
 }
 
-// Add some interactive effects
 document.addEventListener('DOMContentLoaded', function() {
   const gameCards = document.querySelectorAll('.game-card');
   
   gameCards.forEach((card, index) => {
-    // Add click effect
     card.addEventListener('click', function(e) {
       if (!e.target.classList.contains('play-button')) {
         const playButton = this.querySelector('.play-button');
@@ -28,14 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Add random floating animation delays
     const icon = card.querySelector('.game-icon');
     if (icon) {
       icon.style.animationDelay = `${index * 0.5}s`;
     }
   });
   
-  // Add particle effect on hover (optional enhancement)
   gameCards.forEach(card => {
     card.addEventListener('mouseenter', createParticles);
   });
@@ -68,7 +63,6 @@ function createParticles(e) {
   }
 }
 
-// Add CSS for particle animation
 const style = document.createElement('style');
 style.textContent = `
   @keyframes particleFloat {
