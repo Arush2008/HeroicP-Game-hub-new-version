@@ -72,7 +72,10 @@
       </div>
       
       <div class="feedback-display">
-        <h3>Recent Feedback</h3>
+        <div class="feedback-header-controls">
+          <h3>Recent Feedback</h3>
+          <button class="refresh-btn" onclick="refreshFeedbacks()" title="Check for new reviews">🔄 Refresh</button>
+        </div>
         <div id="feedbackList" class="feedback-list">
           <!-- Feedback items will be added here -->
         </div>

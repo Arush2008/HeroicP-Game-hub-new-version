@@ -44,7 +44,7 @@ function playGame(gameType) {
 }
 
 // Feedback System
-function submitFeedback() {
+async function submitFeedback() {
   const playerName = document.getElementById('playerName').value.trim();
   const feedbackText = document.getElementById('feedbackText').value.trim();
   
@@ -72,14 +72,22 @@ function submitFeedback() {
     id: 'feedback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
   };
   
+  // Add to feedbacks array
+  allFeedbacks.unshift(feedbackData);
+  
   // Save to cloud storage
-  saveFeedbackToCloud(feedbackData);
+  if (cloudStorage) {
+    await cloudStorage.saveFeedbacks(allFeedbacks);
+  }
   
   // Clear form
   document.getElementById('playerName').value = '';
   document.getElementById('feedbackText').value = '';
   selectedRating = 0;
   updateStarDisplay();
+  
+  // Refresh display
+  displayFeedbacks();
   
   // Show success message
   showSuccessMessage();
@@ -119,10 +127,7 @@ function showSuccessMessage() {
 function displayFeedbacks() {
   const feedbackList = document.getElementById('feedbackList');
   
-  // Use cloud feedbacks if available, otherwise localStorage
-  const feedbacks = cloudFeedbacks.length > 0 ? cloudFeedbacks : JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
-  
-  if (feedbacks.length === 0) {
+  if (allFeedbacks.length === 0) {
     feedbackList.innerHTML = `
       <div class="no-feedback">
         <p>No feedback yet. Be the first to share your thoughts! 🎮</p>
@@ -132,7 +137,7 @@ function displayFeedbacks() {
   }
   
   // In admin mode, show all feedbacks. In normal mode, show only last 50
-  const feedbacksToShow = isAdminMode ? feedbacks : feedbacks.slice(0, 50);
+  const feedbacksToShow = isAdminMode ? allFeedbacks : allFeedbacks.slice(0, 50);
   
   feedbackList.innerHTML = feedbacksToShow.map((feedback, index) => `
     <div class="feedback-item" data-index="${index}">
@@ -151,11 +156,11 @@ function displayFeedbacks() {
   `).join('');
   
   // Show admin info if in admin mode
-  if (isAdminMode && feedbacks.length > 50) {
+  if (isAdminMode && allFeedbacks.length > 50) {
     const adminInfo = document.createElement('div');
     adminInfo.className = 'admin-info';
     adminInfo.innerHTML = `
-      <p><strong>Admin Mode:</strong> Showing all ${feedbacks.length} reviews (normally only 50 are shown to users)</p>
+      <p><strong>Admin Mode:</strong> Showing all ${allFeedbacks.length} reviews (normally only 50 are shown to users)</p>
     `;
     feedbackList.insertBefore(adminInfo, feedbackList.firstChild);
   }
@@ -165,7 +170,7 @@ function displayFeedbacks() {
   connectionStatus.className = 'connection-status';
   connectionStatus.innerHTML = `
     <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 10px;">
-      ${isCloudConnected ? '🌐 Connected to cloud storage' : '💾 Using local storage'}
+      ${isCloudConnected ? '🌐 Connected to cloud database - Reviews shared across all devices!' : '💾 Using local storage - Reviews only visible on this device'}
     </p>
   `;
   feedbackList.appendChild(connectionStatus);
@@ -194,7 +199,7 @@ function updateStarDisplay() {
 
 // Add some interactive effects
 document.addEventListener('DOMContentLoaded', function() {
-  // Initialize cloud storage
+  // Initialize cloud storage first
   initializeCloudStorage();
   
   const gameCards = document.querySelectorAll('.game-card');
@@ -223,6 +228,18 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize feedback system
   setupFeedbackSystem();
   initializeSampleFeedback();
+  
+  // Auto-refresh feedbacks every 30 seconds to check for new reviews from other devices
+  setInterval(async () => {
+    if (cloudStorage && isCloudConnected) {
+      const latestFeedbacks = await cloudStorage.loadFeedbacks();
+      if (latestFeedbacks.length !== allFeedbacks.length) {
+        allFeedbacks = latestFeedbacks;
+        displayFeedbacks();
+        console.log('Feedbacks refreshed from cloud');
+      }
+    }
+  }, 30000);
 });
 
 function setupFeedbackSystem() {
@@ -306,11 +323,9 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
-function initializeSampleFeedback() {
-  // Add sample feedback if none exists in localStorage
-  let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
-  
-  if (feedbacks.length === 0) {
+async function initializeSampleFeedback() {
+  // If no feedbacks exist yet, add some sample ones
+  if (allFeedbacks.length === 0) {
     const sampleFeedbacks = [
       {
         name: "GameMaster",
@@ -338,10 +353,12 @@ function initializeSampleFeedback() {
       }
     ];
     
-    localStorage.setItem('gameFeedbacks', JSON.stringify(sampleFeedbacks));
-    cloudFeedbacks = sampleFeedbacks;
-  } else {
-    cloudFeedbacks = feedbacks;
+    allFeedbacks = sampleFeedbacks;
+    
+    // Save to cloud storage if available
+    if (cloudStorage) {
+      await cloudStorage.saveFeedbacks(allFeedbacks);
+    }
   }
   
   displayFeedbacks();
@@ -365,27 +382,26 @@ function toggleAdminMode() {
   }
 }
 
-function deleteFeedback(id) {
+async function deleteFeedback(id) {
   if (!isAdminMode) return;
   
   if (confirm("Are you sure you want to delete this feedback?")) {
-    // Delete from both localStorage and cloud array
-    let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
-    
     if (typeof id === 'string' && id.startsWith('feedback_')) {
       // Delete by ID
-      feedbacks = feedbacks.filter(feedback => feedback.id !== id);
-      cloudFeedbacks = cloudFeedbacks.filter(feedback => feedback.id !== id);
+      allFeedbacks = allFeedbacks.filter(feedback => feedback.id !== id);
     } else {
       // Delete by index (fallback)
       const index = parseInt(id);
-      if (!isNaN(index) && index >= 0 && index < feedbacks.length) {
-        feedbacks.splice(index, 1);
-        cloudFeedbacks.splice(index, 1);
+      if (!isNaN(index) && index >= 0 && index < allFeedbacks.length) {
+        allFeedbacks.splice(index, 1);
       }
     }
     
-    localStorage.setItem('gameFeedbacks', JSON.stringify(feedbacks));
+    // Save updated feedbacks to cloud
+    if (cloudStorage) {
+      await cloudStorage.saveFeedbacks(allFeedbacks);
+    }
+    
     displayFeedbacks();
     showAdminMessage("Feedback deleted successfully!");
   }
@@ -423,3 +439,50 @@ document.addEventListener('keydown', function(e) {
     toggleAdminMode();
   }
 });
+
+// Manual refresh function for checking new reviews
+async function refreshFeedbacks() {
+  const refreshBtn = document.querySelector('.refresh-btn');
+  const originalText = refreshBtn.innerHTML;
+  
+  // Show loading state
+  refreshBtn.innerHTML = '🔄 Refreshing...';
+  refreshBtn.disabled = true;
+  
+  try {
+    if (cloudStorage && isCloudConnected) {
+      const latestFeedbacks = await cloudStorage.loadFeedbacks();
+      allFeedbacks = latestFeedbacks;
+      displayFeedbacks();
+      
+      // Show success message
+      const successMsg = document.createElement('div');
+      successMsg.textContent = 'Reviews refreshed! 🎉';
+      successMsg.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(145deg, #00b894, #00a085);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.9em;
+        z-index: 1000;
+        animation: slideInRight 0.3s ease-out;
+      `;
+      
+      document.body.appendChild(successMsg);
+      setTimeout(() => successMsg.remove(), 2000);
+    } else {
+      // Fallback message
+      alert('Using local storage - reviews are only visible on this device');
+    }
+  } catch (error) {
+    console.error('Error refreshing feedbacks:', error);
+    alert('Failed to refresh reviews. Please try again.');
+  } finally {
+    // Restore button state
+    refreshBtn.innerHTML = originalText;
+    refreshBtn.disabled = false;
+  }
+}
