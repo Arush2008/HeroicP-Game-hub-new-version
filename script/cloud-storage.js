@@ -1,12 +1,12 @@
 // Cloud Storage Handler for HeroicP Games Hub
-// This file provides a simple cloud storage solution using GitHub Gist
+// This provides a real cross-device shared storage solution
 
 class CloudStorage {
     constructor() {
-        // GitHub Gist configuration
-        this.gistId = null; // Will be set when first gist is created
-        this.fileName = 'heroicp-feedbacks.json';
-        this.githubToken = null; // Optional - for authenticated requests
+        // JSONBin.io configuration (free service)
+        this.binId = '677c8a51acd3cb34a8c66a8f'; // Fixed bin ID for all devices
+        this.apiKey = '$2a$10$vRHYhcOSAh8NyE8jFdPKge3V3GX3xJ8uOTYCq6GmkKFV8jQ5PjMeW'; // Public read key
+        this.baseUrl = 'https://api.jsonbin.io/v3/b/';
         this.isConnected = false;
         this.fallbackStorage = 'localStorage';
     }
@@ -14,18 +14,8 @@ class CloudStorage {
     // Initialize cloud storage
     async init() {
         try {
-            // Try to load existing gist ID from localStorage
-            const savedGistId = localStorage.getItem('heroicp_gist_id');
-            if (savedGistId) {
-                this.gistId = savedGistId;
-                await this.testConnection();
-            }
-            
-            if (!this.isConnected) {
-                // Create new gist if none exists
-                await this.createGist();
-            }
-            
+            // Test connection by trying to read from the bin
+            await this.testConnection();
             return this.isConnected;
         } catch (error) {
             console.warn('Cloud storage initialization failed, using localStorage:', error);
@@ -34,104 +24,71 @@ class CloudStorage {
         }
     }
 
-    // Test connection to existing gist
+    // Test connection to JSONBin
     async testConnection() {
-        if (!this.gistId) return false;
-        
         try {
-            const response = await fetch(`https://api.github.com/gists/${this.gistId}`);
+            const response = await fetch(`${this.baseUrl}${this.binId}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': this.apiKey,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
             if (response.ok) {
                 this.isConnected = true;
+                console.log('Connected to cloud storage successfully');
                 return true;
+            } else {
+                throw new Error(`Connection test failed: ${response.status}`);
             }
         } catch (error) {
             console.warn('Connection test failed:', error);
-        }
-        
-        this.isConnected = false;
-        return false;
-    }
-
-    // Create a new public gist
-    async createGist() {
-        try {
-            const initialData = {
-                feedbacks: [],
-                created: new Date().toISOString(),
-                version: '1.0'
-            };
-
-            const gistData = {
-                description: 'HeroicP Games Hub - Player Feedbacks',
-                public: true,
-                files: {
-                    [this.fileName]: {
-                        content: JSON.stringify(initialData, null, 2)
-                    }
-                }
-            };
-
-            const headers = {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            };
-
-            if (this.githubToken) {
-                headers['Authorization'] = `token ${this.githubToken}`;
-            }
-
-            const response = await fetch('https://api.github.com/gists', {
-                method: 'POST',
-                headers: headers,
-                body: JSON.stringify(gistData)
-            });
-
-            if (response.ok) {
-                const result = await response.json();
-                this.gistId = result.id;
-                localStorage.setItem('heroicp_gist_id', this.gistId);
-                this.isConnected = true;
-                console.log('Cloud storage initialized with gist:', this.gistId);
-                return true;
-            } else {
-                throw new Error(`Failed to create gist: ${response.status}`);
-            }
-        } catch (error) {
-            console.error('Failed to create gist:', error);
             this.isConnected = false;
             return false;
         }
     }
 
-    // Load feedbacks from cloud
+    // Load feedbacks from cloud storage
     async loadFeedbacks() {
-        if (!this.isConnected || !this.gistId) {
+        if (!this.isConnected) {
             return this.loadFromFallback();
         }
 
         try {
-            const response = await fetch(`https://api.github.com/gists/${this.gistId}`);
-            if (response.ok) {
-                const gist = await response.json();
-                const fileContent = gist.files[this.fileName]?.content;
-                if (fileContent) {
-                    const data = JSON.parse(fileContent);
-                    return data.feedbacks || [];
+            const response = await fetch(`${this.baseUrl}${this.binId}/latest`, {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': this.apiKey,
+                    'Content-Type': 'application/json'
                 }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const feedbacks = data.record?.feedbacks || [];
+                
+                // Save to local storage as backup
+                this.saveToFallback(feedbacks);
+                
+                console.log(`Loaded ${feedbacks.length} feedbacks from cloud storage`);
+                return feedbacks;
+            } else {
+                throw new Error(`Failed to load from cloud: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error loading from cloud:', error);
+            console.error('Error loading from cloud storage:', error);
+            return this.loadFromFallback();
         }
-
-        return this.loadFromFallback();
     }
 
-    // Save feedbacks to cloud
+    // Save feedbacks to cloud storage
     async saveFeedbacks(feedbacks) {
         // Always save to fallback first
         this.saveToFallback(feedbacks);
 
-        if (!this.isConnected || !this.gistId) {
+        if (!this.isConnected) {
+            console.log('Cloud storage not connected, saved to local storage only');
             return false;
         }
 
@@ -139,48 +96,36 @@ class CloudStorage {
             const data = {
                 feedbacks: feedbacks,
                 lastUpdated: new Date().toISOString(),
-                version: '1.0'
+                version: '1.0',
+                totalCount: feedbacks.length
             };
 
-            const gistData = {
-                files: {
-                    [this.fileName]: {
-                        content: JSON.stringify(data, null, 2)
-                    }
-                }
-            };
-
-            const headers = {
-                'Accept': 'application/vnd.github.v3+json',
-                'Content-Type': 'application/json'
-            };
-
-            if (this.githubToken) {
-                headers['Authorization'] = `token ${this.githubToken}`;
-            }
-
-            const response = await fetch(`https://api.github.com/gists/${this.gistId}`, {
-                method: 'PATCH',
-                headers: headers,
-                body: JSON.stringify(gistData)
+            const response = await fetch(`${this.baseUrl}${this.binId}`, {
+                method: 'PUT',
+                headers: {
+                    'X-Master-Key': this.apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             });
 
             if (response.ok) {
-                console.log('Feedbacks saved to cloud successfully');
+                console.log(`Saved ${feedbacks.length} feedbacks to cloud storage successfully`);
                 return true;
             } else {
-                throw new Error(`Failed to update gist: ${response.status}`);
+                throw new Error(`Failed to save to cloud: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error saving to cloud:', error);
+            console.error('Error saving to cloud storage:', error);
             return false;
         }
     }
 
-    // Fallback methods
+    // Fallback methods for local storage
     loadFromFallback() {
         try {
-            return JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
+            const data = localStorage.getItem('gameFeedbacks');
+            return data ? JSON.parse(data) : [];
         } catch (error) {
             console.error('Error loading from fallback storage:', error);
             return [];
@@ -197,12 +142,13 @@ class CloudStorage {
         }
     }
 
-    // Get status
+    // Get connection status
     getStatus() {
         return {
             isConnected: this.isConnected,
-            gistId: this.gistId,
-            fallbackStorage: this.fallbackStorage
+            binId: this.binId,
+            fallbackStorage: this.fallbackStorage,
+            service: 'JSONBin.io'
         };
     }
 }

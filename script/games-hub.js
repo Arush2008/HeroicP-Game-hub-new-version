@@ -102,7 +102,9 @@ function saveFeedbackToLocalStorage(feedbackData) {
 
 function showSuccessMessage() {
   const successMsg = document.createElement('div');
-  successMsg.textContent = 'Thank you for your feedback! 🎉';
+  successMsg.textContent = isCloudConnected ? 
+    'Thank you! Your review has been shared across all devices! 🌐✨' : 
+    'Thank you! Your review has been saved locally! 💾';
   successMsg.style.cssText = `
     position: fixed;
     top: 20px;
@@ -114,6 +116,8 @@ function showSuccessMessage() {
     font-weight: bold;
     z-index: 1000;
     animation: slideInRight 0.5s ease-out;
+    max-width: 300px;
+    text-align: center;
   `;
   
   document.body.appendChild(successMsg);
@@ -121,7 +125,7 @@ function showSuccessMessage() {
   setTimeout(() => {
     successMsg.style.animation = 'slideOutRight 0.5s ease-out';
     setTimeout(() => successMsg.remove(), 500);
-  }, 3000);
+  }, 4000);
 }
 
 function displayFeedbacks() {
@@ -170,7 +174,7 @@ function displayFeedbacks() {
   connectionStatus.className = 'connection-status';
   connectionStatus.innerHTML = `
     <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 10px;">
-      ${isCloudConnected ? '🌐 Connected to cloud database - Reviews shared across all devices!' : '💾 Using local storage - Reviews only visible on this device'}
+      ${isCloudConnected ? '🌐 Reviews synced across all devices!' : '💾 Reviews saved locally only - use refresh button to check for updates'}
     </p>
   `;
   feedbackList.appendChild(connectionStatus);
