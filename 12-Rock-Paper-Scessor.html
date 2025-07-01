@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Rock Paper Scissors</title>
+  <link rel="stylesheet" href="styles/12-rock-paper-scissor.css" />
+  <script defer src="script/12-rock-paper-scissor.js"></script>
+</head>
+<body>
+  <div class="header">
+    <p class="title">Rock Paper Scissors</p>
+    <button class="back-button" onclick="goHome()">← Back to Games</button>
+  </div>
+  
+  <p class="js-score score"></p>
+  <p class="headline">Choose any of the options below</p>
+
+  <div class="game-options">
+    <button class="image-button js-rock-button">
+      <img src="images/rock.png" class="image-icon" alt="Rock" />
+    </button>
+
+    <button class="image-button js-paper-button">
+      <img src="images/paper.png" class="image-icon" alt="Paper" />
+    </button>
+
+    <button class="image-button js-scissors-button">
+      <img src="images/scissor.png" class="image-icon" alt="Scissors" />
+    </button>
+  </div>
+
+  <p class="js-result result"></p>
+  
+  <div class="game-round-info">
+    <p class="js-moves moves-display"></p>
+  </div>
+
+  <div class="button-group">
+    <button class="reset-score-button js-reset-score-button">Reset Score</button>
+    <button class="auto-play-button js-auto-play-button">Auto Play</button>
+    <button class="info-button js-show-last-round-button">Show Last Round Details</button>
+    <button class="info-button js-show-score-breakdown-button">Show Score Breakdown</button>
+  </div>
+
+  <p class="js-last-round-details details"></p>
+  <p class="js-score-breakdown details"></p>
+  
+  <footer class="footer">
+    <p>&copy; 2025 HeroicP. All rights reserved.</p>
+  </footer>
+</body>
+</html>

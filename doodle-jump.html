@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doodle Jump - HeroicP Games</title>
+  <link rel="stylesheet" href="styles/doodle-jump.css" />
+</head>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <h1>Doodle Jump</h1>
+      <button class="back-button" onclick="goHome()">← Back to Games</button>
+    </div>
+    
+    <div class="game-area">
+      <canvas id="gameCanvas" width="400" height="600"></canvas>
+      <div class="game-ui">
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="high-score">High Score: <span id="highScore">0</span></div>
+      </div>
+      
+      <div class="game-over" id="gameOver" style="display: none;">
+        <h2>Game Over!</h2>
+        <p>Height Reached: <span id="finalScore">0</span></p>
+        <p>Best Height: <span id="finalHighScore">0</span></p>
+        <p><em>Press SPACE or click to restart</em></p>
+        <button class="restart-button" onclick="restartGame()">Jump Again</button>
+        <button class="home-button" onclick="goHome()">Back to Games</button>
+      </div>
+      
+      <div class="start-screen" id="startScreen">
+        <h2>Doodle Jump</h2>
+        <p>Use A/D keys or Arrow keys to move left/right!</p>
+        <p>Jump on platforms to reach new heights!</p>
+        <p>Don't fall down!</p>
+        <p><em>Press SPACE or click anywhere to start jumping!</em></p>
+        <button class="start-button" onclick="startGame()">Start Jumping</button>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <p>Controls: A/D keys or ← → Arrow keys to move | SPACE or Click to start/restart</p>
+    </div>
+  </div>
+  
+  <footer class="footer">
+    <p>&copy; 2025 HeroicP. All rights reserved.</p>
+  </footer>
+  
+  <script src="script/doodle-jump.js"></script>
+</body>
+</html>

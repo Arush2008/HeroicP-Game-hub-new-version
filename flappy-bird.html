@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Bird - HeroicP Games</title>
+  <link rel="stylesheet" href="styles/flappy-bird.css" />
+</head>
+<body>
+  <div class="game-container">
+    <div class="header">
+      <h1>Flappy Bird</h1>
+      <button class="back-button" onclick="goHome()">← Back to Games</button>
+    </div>
+    
+    <div class="game-area">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
+      <div class="game-ui">
+        <div class="score">Score: <span id="score">0</span></div>
+        <div class="high-score">High Score: <span id="highScore">0</span></div>
+      </div>
+      
+      <div class="game-over" id="gameOver" style="display: none;">
+        <h2>Game Over!</h2>
+        <p>Score: <span id="finalScore">0</span></p>
+        <p>High Score: <span id="finalHighScore">0</span></p>
+        <p><em>Press SPACE or click to restart</em></p>
+        <button class="restart-button" onclick="restartGame()">Play Again</button>
+        <button class="home-button" onclick="goHome()">Back to Games</button>
+      </div>
+      
+      <div class="start-screen" id="startScreen">
+        <h2>Flappy Bird</h2>
+        <p>Press SPACE or click to flap your wings!</p>
+        <p>Avoid the pipes and score as high as possible!</p>
+        <p><em>Press SPACE or click anywhere to start!</em></p>
+        <button class="start-button" onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+    
+    <div class="controls">
+      <p>Controls: SPACE key or Click to flap | SPACE or Click to start/restart</p>
+    </div>
+  </div>
+  
+  <footer class="footer">
+    <p>&copy; 2025 HeroicP. All rights reserved.</p>
+  </footer>
+  
+  <script src="script/flappy-bird.js"></script>
+</body>
+</html>

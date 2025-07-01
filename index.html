@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeroicP Games Hub</title>
+  <link rel="stylesheet" href="styles/games-hub.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="main-title">HeroicP Games Hub</h1>
+      <p class="subtitle">Choose your adventure from our collection of games</p>
+    </header>
+
+    <main class="games-grid">
+      <div class="game-card" data-game="rock-paper-scissors">
+        <div class="game-icon">🎮</div>
+        <h2 class="game-title">Rock Paper Scissors</h2>
+        <p class="game-description">Classic hand game with beautiful animations and score tracking</p>
+        <div class="game-features">
+          <span class="feature">Auto Play</span>
+          <span class="feature">Score Tracking</span>
+          <span class="feature">Keyboard Controls</span>
+        </div>
+        <button class="play-button" onclick="playGame('rock-paper-scissors')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="flappy-bird">
+        <div class="game-icon">🐦</div>
+        <h2 class="game-title">Flappy Bird</h2>
+        <p class="game-description">Navigate through pipes in this addictive side-scrolling adventure</p>
+        <div class="game-features">
+          <span class="feature">High Score</span>
+          <span class="feature">Smooth Physics</span>
+          <span class="feature">Endless Gameplay</span>
+        </div>
+        <button class="play-button" onclick="playGame('flappy-bird')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="doodle-jump">
+        <div class="game-icon">🦘</div>
+        <h2 class="game-title">Doodle Jump</h2>
+        <p class="game-description">Jump your way to the top in this gravity-defying platformer</p>
+        <div class="game-features">
+          <span class="feature">Power-ups</span>
+          <span class="feature">Moving Platforms</span>
+          <span class="feature">Endless Heights</span>
+        </div>
+        <button class="play-button" onclick="playGame('doodle-jump')">Play Now</button>
+      </div>
+    </main>
+
+    <section class="feedback-section">
+      <h2 class="feedback-title">Player Feedback</h2>
+      <p class="feedback-subtitle">Share your thoughts and see what other players are saying!</p>
+      
+      <div class="feedback-form">
+        <input type="text" id="playerName" placeholder="Your name" maxlength="30" />
+        <textarea id="feedbackText" placeholder="Share your feedback about the games..." maxlength="500"></textarea>
+        <div class="rating-section">
+          <span>Rate your experience:</span>
+          <div class="stars" id="starRating">
+            <span class="star" data-rating="1">⭐</span>
+            <span class="star" data-rating="2">⭐</span>
+            <span class="star" data-rating="3">⭐</span>
+            <span class="star" data-rating="4">⭐</span>
+            <span class="star" data-rating="5">⭐</span>
+          </div>
+        </div>
+        <button class="submit-feedback-btn" onclick="submitFeedback()">Submit Feedback</button>
+      </div>
+      
+      <div class="feedback-display">
+        <h3>Recent Feedback</h3>
+        <div id="feedbackList" class="feedback-list">
+          <!-- Feedback items will be added here -->
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>&copy; 2025 HeroicP. All rights reserved.</p>
+      <p class="footer-subtitle">Crafted with ❤️ for gaming enthusiasts</p>
+    </footer>
+  </div>
+
+  <script src="script/games-hub.js"></script>
+</body>
+</html>
