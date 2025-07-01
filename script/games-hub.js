@@ -3,6 +3,30 @@ let selectedRating = 0;
 let isAdminMode = false;
 const ADMIN_PASSWORD = "Arush@100"; // Change this to your preferred password
 
+// Cloud storage instance
+let cloudStorage = null;
+let isCloudConnected = false;
+let allFeedbacks = [];
+
+async function initializeCloudStorage() {
+    try {
+        cloudStorage = new window.CloudStorage();
+        isCloudConnected = await cloudStorage.init();
+        
+        // Load feedbacks from cloud
+        allFeedbacks = await cloudStorage.loadFeedbacks();
+        
+        console.log(isCloudConnected ? 'Cloud storage connected' : 'Using local storage fallback');
+        displayFeedbacks();
+    } catch (error) {
+        console.error('Cloud storage initialization failed:', error);
+        isCloudConnected = false;
+        // Fallback to localStorage
+        allFeedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
+        displayFeedbacks();
+    }
+}
+
 function playGame(gameType) {
   switch(gameType) {
     case 'rock-paper-scissors':
@@ -43,17 +67,13 @@ function submitFeedback() {
     name: playerName,
     text: feedbackText,
     rating: selectedRating,
-    date: new Date().toLocaleDateString()
+    date: new Date().toLocaleDateString(),
+    timestamp: Date.now(),
+    id: 'feedback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9)
   };
   
-  // Save to localStorage
-  let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
-  feedbacks.unshift(feedbackData); // Add to beginning
-  
-  // Keep all feedbacks for admin, but note that we only show 50 to regular users
-  // No longer limiting to 50 in storage - let admin see everything
-  
-  localStorage.setItem('gameFeedbacks', JSON.stringify(feedbacks));
+  // Save to cloud storage
+  saveFeedbackToCloud(feedbackData);
   
   // Clear form
   document.getElementById('playerName').value = '';
@@ -61,11 +81,15 @@ function submitFeedback() {
   selectedRating = 0;
   updateStarDisplay();
   
-  // Refresh feedback display
-  displayFeedbacks();
-  
   // Show success message
   showSuccessMessage();
+}
+
+function saveFeedbackToLocalStorage(feedbackData) {
+  let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
+  feedbacks.unshift(feedbackData);
+  localStorage.setItem('gameFeedbacks', JSON.stringify(feedbacks));
+  displayFeedbacks();
 }
 
 function showSuccessMessage() {
@@ -94,7 +118,9 @@ function showSuccessMessage() {
 
 function displayFeedbacks() {
   const feedbackList = document.getElementById('feedbackList');
-  const feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
+  
+  // Use cloud feedbacks if available, otherwise localStorage
+  const feedbacks = cloudFeedbacks.length > 0 ? cloudFeedbacks : JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
   
   if (feedbacks.length === 0) {
     feedbackList.innerHTML = `
@@ -117,7 +143,7 @@ function displayFeedbacks() {
         </div>
         <div class="feedback-controls">
           <span class="feedback-date">${feedback.date}</span>
-          ${isAdminMode ? `<button class="delete-btn" onclick="deleteFeedback(${index})" title="Delete feedback">🗑️</button>` : ''}
+          ${isAdminMode ? `<button class="delete-btn" onclick="deleteFeedback('${feedback.id || index}')" title="Delete feedback">🗑️</button>` : ''}
         </div>
       </div>
       <div class="feedback-text">${escapeHtml(feedback.text)}</div>
@@ -133,6 +159,16 @@ function displayFeedbacks() {
     `;
     feedbackList.insertBefore(adminInfo, feedbackList.firstChild);
   }
+  
+  // Show connection status
+  const connectionStatus = document.createElement('div');
+  connectionStatus.className = 'connection-status';
+  connectionStatus.innerHTML = `
+    <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 10px;">
+      ${isCloudConnected ? '🌐 Connected to cloud storage' : '💾 Using local storage'}
+    </p>
+  `;
+  feedbackList.appendChild(connectionStatus);
 }
 
 function escapeHtml(text) {
@@ -158,6 +194,9 @@ function updateStarDisplay() {
 
 // Add some interactive effects
 document.addEventListener('DOMContentLoaded', function() {
+  // Initialize cloud storage
+  initializeCloudStorage();
+  
   const gameCards = document.querySelectorAll('.game-card');
   
   gameCards.forEach((card, index) => {
@@ -184,7 +223,6 @@ document.addEventListener('DOMContentLoaded', function() {
   // Initialize feedback system
   setupFeedbackSystem();
   initializeSampleFeedback();
-  displayFeedbacks();
 });
 
 function setupFeedbackSystem() {
@@ -269,7 +307,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 function initializeSampleFeedback() {
-  // Add sample feedback if none exists
+  // Add sample feedback if none exists in localStorage
   let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
   
   if (feedbacks.length === 0) {
@@ -278,24 +316,35 @@ function initializeSampleFeedback() {
         name: "GameMaster",
         text: "Love the Rock Paper Scissors game! The animations are so smooth and the auto-play feature is genius. Great work HeroicP!",
         rating: 5,
-        date: "7/1/2025"
+        date: "7/1/2025",
+        timestamp: Date.now() - 86400000,
+        id: 'sample_1'
       },
       {
         name: "FlappyFan",
         text: "Flappy Bird is a bit weired as it is a bit glitchy but other games are amazing! The graphics are beautiful and it runs so smoothly!",
         rating: 3,
-        date: "7/1/2025"
+        date: "7/1/2025",
+        timestamp: Date.now() - 43200000,
+        id: 'sample_2'
       },
       {
         name: "JumpingJoe",
         text: "Doodle Jump is addictive! I love the moving platforms feature. Spent hours trying to beat my high score. Amazing games collection!",
         rating: 5,
-        date: "7/1/2025"
+        date: "7/1/2025",
+        timestamp: Date.now() - 21600000,
+        id: 'sample_3'
       }
     ];
     
     localStorage.setItem('gameFeedbacks', JSON.stringify(sampleFeedbacks));
+    cloudFeedbacks = sampleFeedbacks;
+  } else {
+    cloudFeedbacks = feedbacks;
   }
+  
+  displayFeedbacks();
 }
 
 // Admin Functions
@@ -316,12 +365,26 @@ function toggleAdminMode() {
   }
 }
 
-function deleteFeedback(index) {
+function deleteFeedback(id) {
   if (!isAdminMode) return;
   
   if (confirm("Are you sure you want to delete this feedback?")) {
+    // Delete from both localStorage and cloud array
     let feedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
-    feedbacks.splice(index, 1);
+    
+    if (typeof id === 'string' && id.startsWith('feedback_')) {
+      // Delete by ID
+      feedbacks = feedbacks.filter(feedback => feedback.id !== id);
+      cloudFeedbacks = cloudFeedbacks.filter(feedback => feedback.id !== id);
+    } else {
+      // Delete by index (fallback)
+      const index = parseInt(id);
+      if (!isNaN(index) && index >= 0 && index < feedbacks.length) {
+        feedbacks.splice(index, 1);
+        cloudFeedbacks.splice(index, 1);
+      }
+    }
+    
     localStorage.setItem('gameFeedbacks', JSON.stringify(feedbacks));
     displayFeedbacks();
     showAdminMessage("Feedback deleted successfully!");
