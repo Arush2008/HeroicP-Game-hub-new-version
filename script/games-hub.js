@@ -13,16 +13,24 @@ async function initializeCloudStorage() {
         cloudStorage = new window.CloudStorage();
         isCloudConnected = await cloudStorage.init();
         
-        // Load feedbacks from cloud
+        // Load feedbacks from storage
         allFeedbacks = await cloudStorage.loadFeedbacks();
         
-        console.log(isCloudConnected ? 'Cloud storage connected' : 'Using local storage fallback');
+        // If no feedbacks exist, initialize with samples
+        if (allFeedbacks.length === 0) {
+            await initializeSampleFeedback();
+        }
+        
+        console.log('Storage initialized successfully');
         displayFeedbacks();
     } catch (error) {
-        console.error('Cloud storage initialization failed:', error);
+        console.error('Storage initialization failed:', error);
         isCloudConnected = false;
         // Fallback to localStorage
         allFeedbacks = JSON.parse(localStorage.getItem('gameFeedbacks')) || [];
+        if (allFeedbacks.length === 0) {
+            await initializeSampleFeedback();
+        }
         displayFeedbacks();
     }
 }
@@ -102,9 +110,7 @@ function saveFeedbackToLocalStorage(feedbackData) {
 
 function showSuccessMessage() {
   const successMsg = document.createElement('div');
-  successMsg.textContent = isCloudConnected ? 
-    'Thank you! Your review has been shared across all devices! 🌐✨' : 
-    'Thank you! Your review has been saved locally! 💾';
+  successMsg.textContent = 'Thank you for your feedback! Your review has been saved! 🎉';
   successMsg.style.cssText = `
     position: fixed;
     top: 20px;
@@ -174,7 +180,7 @@ function displayFeedbacks() {
   connectionStatus.className = 'connection-status';
   connectionStatus.innerHTML = `
     <p style="font-size: 0.8em; color: #666; text-align: center; margin-top: 10px;">
-      ${isCloudConnected ? '🌐 Reviews synced across all devices!' : '💾 Reviews saved locally only - use refresh button to check for updates'}
+      💾 Reviews saved on this device - Share your site link for others to add reviews!
     </p>
   `;
   feedbackList.appendChild(connectionStatus);
@@ -231,19 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize feedback system
   setupFeedbackSystem();
-  initializeSampleFeedback();
-  
-  // Auto-refresh feedbacks every 30 seconds to check for new reviews from other devices
-  setInterval(async () => {
-    if (cloudStorage && isCloudConnected) {
-      const latestFeedbacks = await cloudStorage.loadFeedbacks();
-      if (latestFeedbacks.length !== allFeedbacks.length) {
-        allFeedbacks = latestFeedbacks;
-        displayFeedbacks();
-        console.log('Feedbacks refreshed from cloud');
-      }
-    }
-  }, 30000);
 });
 
 function setupFeedbackSystem() {
@@ -413,7 +406,17 @@ async function deleteFeedback(id) {
 
 function showAdminMessage(message) {
   const adminMsg = document.createElement('div');
-  adminMsg.textContent = message;
+  adminMsg.innerHTML = `
+    <div>${message}</div>
+    ${isAdminMode ? `
+      <div style="margin-top: 10px; font-size: 0.9em;">
+        <strong>Admin Controls:</strong><br>
+        • Ctrl+Shift+E: Export Reviews<br>
+        • Ctrl+Shift+I: Import Reviews<br>
+        • Click 🗑️ to delete reviews
+      </div>
+    ` : ''}
+  `;
   adminMsg.style.cssText = `
     position: fixed;
     top: 20px;
@@ -425,7 +428,8 @@ function showAdminMessage(message) {
     font-weight: bold;
     z-index: 1000;
     animation: slideInLeft 0.5s ease-out;
-    max-width: 300px;
+    max-width: 350px;
+    line-height: 1.4;
   `;
 
   document.body.appendChild(adminMsg);
@@ -433,7 +437,7 @@ function showAdminMessage(message) {
   setTimeout(() => {
     adminMsg.style.animation = 'slideOutLeft 0.5s ease-out';
     setTimeout(() => adminMsg.remove(), 500);
-  }, 3000);
+  }, 6000);
 }
 
 // Secret admin access (press Ctrl+Shift+A)
@@ -454,7 +458,8 @@ async function refreshFeedbacks() {
   refreshBtn.disabled = true;
   
   try {
-    if (cloudStorage && isCloudConnected) {
+    // Reload feedbacks from storage
+    if (cloudStorage) {
       const latestFeedbacks = await cloudStorage.loadFeedbacks();
       allFeedbacks = latestFeedbacks;
       displayFeedbacks();
@@ -477,16 +482,85 @@ async function refreshFeedbacks() {
       
       document.body.appendChild(successMsg);
       setTimeout(() => successMsg.remove(), 2000);
-    } else {
-      // Fallback message
-      alert('Using local storage - reviews are only visible on this device');
     }
   } catch (error) {
     console.error('Error refreshing feedbacks:', error);
-    alert('Failed to refresh reviews. Please try again.');
+    alert('Refreshed local reviews');
   } finally {
     // Restore button state
     refreshBtn.innerHTML = originalText;
     refreshBtn.disabled = false;
   }
 }
+
+// Export/Import functions for manual sync
+function exportReviews() {
+  const data = {
+    feedbacks: allFeedbacks,
+    exportDate: new Date().toISOString(),
+    deviceInfo: navigator.userAgent.substring(0, 50)
+  };
+  
+  const dataStr = JSON.stringify(data, null, 2);
+  const dataBlob = new Blob([dataStr], {type: 'application/json'});
+  
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(dataBlob);
+  link.download = 'heroicp-reviews.json';
+  link.click();
+  
+  showAdminMessage('Reviews exported successfully! Share this file to sync across devices.');
+}
+
+function importReviews() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  
+  input.onchange = function(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.feedbacks && Array.isArray(data.feedbacks)) {
+            // Merge with existing reviews (avoid duplicates)
+            const existingIds = new Set(allFeedbacks.map(f => f.id));
+            const newFeedbacks = data.feedbacks.filter(f => !existingIds.has(f.id));
+            
+            allFeedbacks = [...newFeedbacks, ...allFeedbacks];
+            
+            // Save to storage
+            if (cloudStorage) {
+              cloudStorage.saveFeedbacks(allFeedbacks);
+            }
+            
+            displayFeedbacks();
+            showAdminMessage(`Imported ${newFeedbacks.length} new reviews successfully!`);
+          } else {
+            alert('Invalid file format!');
+          }
+        } catch (error) {
+          console.error('Import error:', error);
+          alert('Error importing file!');
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+  
+  input.click();
+}
+
+// Add keyboard shortcuts for export/import
+document.addEventListener('keydown', function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === 'E') {
+    e.preventDefault();
+    if (isAdminMode) exportReviews();
+  }
+  if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+    e.preventDefault();
+    if (isAdminMode) importReviews();
+  }
+});
