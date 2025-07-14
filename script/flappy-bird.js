@@ -6,8 +6,8 @@ const ctx = canvas.getContext('2d');
 let gameState = 'start'; 
 let score = 0;
 let highScore = localStorage.getItem('flappyBirdHighScore') || 0;
-let gameSpeed = 1.5; 
-let gravity = 0.35; 
+let gameSpeed = 2; 
+let gravity = 0.4; 
 
 
 const bird = {
@@ -16,14 +16,14 @@ const bird = {
   width: 30,
   height: 30,
   velocity: 0,
-  jumpPower: -8, 
+  jumpPower: -7, 
   color: '#FFD700'
 };
 
 
 let pipes = [];
 const pipeWidth = 60;
-const pipeGap = 180; 
+const pipeGap = 200; 
 
 
 let clouds = [];
@@ -32,8 +32,9 @@ let clouds = [];
 function init() {
   updateHighScoreDisplay();
   generateClouds();
+  bird.y = canvas.height / 2;
+  bird.velocity = 0;
   gameLoop();
-  
   
   document.addEventListener('keydown', handleInput);
   canvas.addEventListener('click', handleInput);
@@ -103,12 +104,12 @@ function generateFirstPipe() {
     if (gameState === 'playing') {
       addPipe();
     }
-  }, 1000);
+  }, 2000);
 }
 
 function addPipe() {
-  const minHeight = 50;
-  const maxHeight = canvas.height - pipeGap - minHeight;
+  const minHeight = 80;
+  const maxHeight = canvas.height - pipeGap - 80;
   const topHeight = minHeight + Math.random() * (maxHeight - minHeight);
   
   pipes.push({
@@ -121,27 +122,28 @@ function addPipe() {
 }
 
 function updateGame() {
-  if (gameState !== 'playing') return;
-  
+  if (gameState !== 'playing') {
+    if (gameState === 'start') {
+      bird.y = canvas.height / 2 + Math.sin(Date.now() * 0.005) * 10;
+      bird.velocity = 0;
+    }
+    return;
+  }
   
   bird.velocity += gravity;
   bird.y += bird.velocity;
-  
   
   if (bird.y < 0) {
     bird.y = 0;
     bird.velocity = 0;
   }
   
-  
   pipes.forEach((pipe, index) => {
     pipe.x -= gameSpeed;
-    
     
     if (pipe.x + pipeWidth < 0) {
       pipes.splice(index, 1);
     }
-    
     
     if (!pipe.scored && pipe.x + pipeWidth < bird.x) {
       pipe.scored = true;
@@ -150,8 +152,7 @@ function updateGame() {
     }
   });
   
-  
-  if (pipes.length === 0 || (pipes.length > 0 && pipes[pipes.length - 1].x < canvas.width - 300)) {
+  if (pipes.length === 0 || (pipes.length > 0 && pipes[pipes.length - 1].x < canvas.width - 400)) {
     addPipe();
   }
   
@@ -169,19 +170,16 @@ function updateGame() {
 }
 
 function checkCollisions() {
-  
-  if (bird.y + bird.height > canvas.height - 10 || bird.y < 10) {
+  if (bird.y + bird.height > canvas.height - 5 || bird.y < 5) {
     gameOver();
     return;
   }
   
-  
   pipes.forEach(pipe => {
-    
-    const birdLeft = bird.x + 8;
-    const birdRight = bird.x + bird.width - 8;
-    const birdTop = bird.y + 8;
-    const birdBottom = bird.y + bird.height - 8;
+    const birdLeft = bird.x + 5;
+    const birdRight = bird.x + bird.width - 5;
+    const birdTop = bird.y + 5;
+    const birdBottom = bird.y + bird.height - 5;
     
     const pipeLeft = pipe.x;
     const pipeRight = pipe.x + pipeWidth;
