@@ -84,7 +84,7 @@ body {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg, #ff6b6b, #feca57, #48dbfb, #ff9ff3);
+  background: linear-gradient(45deg, #ff9999, #ffcccc, #ff6b6b, #ff8a8a);
   border-radius: 50px;
   z-index: -1;
   opacity: 0;
