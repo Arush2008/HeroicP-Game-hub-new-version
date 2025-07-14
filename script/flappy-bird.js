@@ -2,13 +2,13 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-
-let gameState = 'start'; 
+let gameState = 'waiting';
 let score = 0;
 let highScore = localStorage.getItem('flappyBirdHighScore') || 0;
-let gameSpeed = 2; 
-let gravity = 0.4; 
-
+let gameSpeed = 2;
+let gravity = 0.5;
+let jumpPower = -9;
+let gameStarted = false;
 
 const bird = {
   x: 100,
@@ -16,28 +16,32 @@ const bird = {
   width: 30,
   height: 30,
   velocity: 0,
-  jumpPower: -7, 
   color: '#FFD700'
 };
 
-
 let pipes = [];
 const pipeWidth = 60;
-const pipeGap = 200; 
-
+const pipeGap = 180;
+const pipeSpacing = 300;
 
 let clouds = [];
+let frameCount = 0;
 
 
 function init() {
   updateHighScoreDisplay();
   generateClouds();
-  bird.y = canvas.height / 2;
-  bird.velocity = 0;
+  resetBird();
   gameLoop();
   
   document.addEventListener('keydown', handleInput);
   canvas.addEventListener('click', handleInput);
+}
+
+function resetBird() {
+  bird.x = 100;
+  bird.y = canvas.height / 2;
+  bird.velocity = 0;
 }
 
 function generateClouds() {
@@ -54,79 +58,73 @@ function generateClouds() {
 }
 
 function handleInput(e) {
+  if (e.type === 'keydown' && e.code !== 'Space') return;
+  if (e.type === 'keydown') e.preventDefault();
   
-  if (e.type === 'keydown') {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      if (gameState === 'playing') {
-        bird.velocity = bird.jumpPower;
-      } else if (gameState === 'start') {
-        startGame();
-      } else if (gameState === 'gameOver') {
-        restartGame();
-      }
+  if (gameState === 'waiting') {
+    startGame();
+  } else if (gameState === 'playing') {
+    if (!gameStarted) {
+      gameStarted = true;
     }
-  } else if (e.type === 'click') {
-    if (gameState === 'playing') {
-      bird.velocity = bird.jumpPower;
-    } else if (gameState === 'start') {
-      startGame();
-    } else if (gameState === 'gameOver') {
-      restartGame();
-    }
+    jump();
+  } else if (gameState === 'gameOver') {
+    restartGame();
   }
+}
+
+function jump() {
+  bird.velocity = jumpPower;
 }
 
 function startGame() {
   gameState = 'playing';
+  gameStarted = false;
   score = 0;
   pipes = [];
-  bird.x = 100;
-  bird.y = canvas.height / 2;
-  bird.velocity = 0;
+  resetBird();
+  frameCount = 0;
   document.getElementById('startScreen').style.display = 'none';
-  generateFirstPipe();
 }
 
 function restartGame() {
   gameState = 'playing';
+  gameStarted = false;
   score = 0;
   pipes = [];
-  bird.x = 100;
-  bird.y = canvas.height / 2;
-  bird.velocity = 0;
+  resetBird();
+  frameCount = 0;
   document.getElementById('gameOver').style.display = 'none';
-  generateFirstPipe();
-}
-
-function generateFirstPipe() {
-  setTimeout(() => {
-    if (gameState === 'playing') {
-      addPipe();
-    }
-  }, 2000);
 }
 
 function addPipe() {
-  const minHeight = 80;
-  const maxHeight = canvas.height - pipeGap - 80;
-  const topHeight = minHeight + Math.random() * (maxHeight - minHeight);
+  const minGapY = 100;
+  const maxGapY = canvas.height - 200;
+  const gapY = minGapY + Math.random() * (maxGapY - minGapY);
   
   pipes.push({
     x: canvas.width,
-    topHeight: topHeight,
-    bottomY: topHeight + pipeGap,
-    bottomHeight: canvas.height - (topHeight + pipeGap),
+    topHeight: gapY,
+    bottomY: gapY + pipeGap,
+    bottomHeight: canvas.height - (gapY + pipeGap),
     scored: false
   });
 }
 
 function updateGame() {
-  if (gameState !== 'playing') {
-    if (gameState === 'start') {
-      bird.y = canvas.height / 2 + Math.sin(Date.now() * 0.005) * 10;
-      bird.velocity = 0;
-    }
+  frameCount++;
+  
+  if (gameState === 'waiting') {
+    bird.y = canvas.height / 2 + Math.sin(frameCount * 0.1) * 5;
+    bird.velocity = 0;
+    return;
+  }
+  
+  if (gameState !== 'playing') return;
+  
+  if (!gameStarted) {
+    bird.y = canvas.height / 2;
+    bird.velocity = 0;
     return;
   }
   
@@ -152,7 +150,7 @@ function updateGame() {
     }
   });
   
-  if (pipes.length === 0 || (pipes.length > 0 && pipes[pipes.length - 1].x < canvas.width - 400)) {
+  if (gameStarted && frameCount % 120 === 0) {
     addPipe();
   }
   
@@ -170,16 +168,16 @@ function updateGame() {
 }
 
 function checkCollisions() {
-  if (bird.y + bird.height > canvas.height - 5 || bird.y < 5) {
+  if (bird.y + bird.height >= canvas.height || bird.y <= 0) {
     gameOver();
     return;
   }
   
   pipes.forEach(pipe => {
-    const birdLeft = bird.x + 5;
-    const birdRight = bird.x + bird.width - 5;
-    const birdTop = bird.y + 5;
-    const birdBottom = bird.y + bird.height - 5;
+    const birdLeft = bird.x;
+    const birdRight = bird.x + bird.width;
+    const birdTop = bird.y;
+    const birdBottom = bird.y + bird.height;
     
     const pipeLeft = pipe.x;
     const pipeRight = pipe.x + pipeWidth;
