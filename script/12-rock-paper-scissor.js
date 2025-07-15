@@ -119,9 +119,6 @@ function playGame(playerMove) {
     <img src="images/${computerMove}.png" class="image-icon" alt="${computerMove}" />
     <strong>Computer's Move</strong>
   `;
-  movesElement.style.animation = 'none';
-  movesElement.offsetHeight; 
-  movesElement.style.animation = 'fadeIn 0.5s ease-in';
 }
 
 function updateScore() {

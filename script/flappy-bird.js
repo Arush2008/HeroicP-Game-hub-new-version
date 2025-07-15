@@ -192,16 +192,17 @@ function checkCollisions() {
 
 function gameOver() {
   gameState = 'gameOver';
-  
-  
+  // Update high score
   if (score > highScore) {
     highScore = score;
     localStorage.setItem('flappyBirdHighScore', highScore);
   }
   
-  
+  // Update final score display
   document.getElementById('finalScore').textContent = score;
   document.getElementById('finalHighScore').textContent = highScore;
+  
+  // Show the game over screen
   document.getElementById('gameOver').style.display = 'block';
 }
 
