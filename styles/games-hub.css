@@ -127,6 +127,7 @@ body {
 .game-card:nth-child(1) .game-icon { animation-delay: 0s; }
 .game-card:nth-child(2) .game-icon { animation-delay: 0.5s; }
 .game-card:nth-child(3) .game-icon { animation-delay: 1s; }
+.game-card:nth-child(4) .game-icon { animation-delay: 1.5s; }
 
 .game-title {
   font-size: 1.8rem;
