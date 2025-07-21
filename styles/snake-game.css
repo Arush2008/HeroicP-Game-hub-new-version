@@ -11,11 +11,13 @@ body {
   color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  padding: 40px 20px;
+  padding: 40px 20px 0;
   min-height: 100vh;
   margin: 0;
   animation: fadeIn 1s ease-in;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes gradientMove {
@@ -31,6 +33,9 @@ body {
 .container {
   max-width: 800px;
   margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .header {
@@ -129,12 +134,25 @@ body {
 }
 
 .footer {
-  text-align: center;
-  padding: 20px;
-  color: rgba(255, 255, 255, 0.8);
+  margin-top: auto;
+  padding: 20px 0;
   border-top: 1px solid rgba(255, 255, 255, 0.2);
-  margin-top: 30px;
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.footer p {
+  margin: 0;
   font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+  font-weight: 300;
+  letter-spacing: 0.5px;
+}
+
+.footer p:hover {
+  color: rgba(255, 255, 255, 1);
+  transition: color 0.3s ease;
 }
 
 .game-overlay {
