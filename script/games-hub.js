@@ -9,6 +9,9 @@ function playGame(gameType) {
     case 'doodle-jump':
       window.location.href = 'doodle-jump.html';
       break;
+    case 'snake':
+      window.location.href = 'snake-game.html';
+      break;
     default:
       alert('Game coming soon!');
   }

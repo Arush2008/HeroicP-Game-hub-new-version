@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Snake Game - HeroicP Games Hub</title>
+  <link rel="stylesheet" href="styles/snake-game.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="home-button" onclick="goHome()">🏠 Home</button>
+      <h1>Snake Game</h1>
+    </div>
+    
+    <div class="game-info">
+      <div class="score-container">
+        <p class="js-score">Score: 0</p>
+        <p class="js-high-score">High Score: 0</p>
+      </div>
+      
+      <div class="difficulty-selector">
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty" class="js-difficulty-select">
+          <option value="easy">Easy</option>
+          <option value="medium" selected>Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="game-container">
+      <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <div class="game-overlay js-game-overlay">
+        <div class="start-screen js-start-screen">
+          <h2>Snake Game</h2>
+          <p>Use arrow keys or WASD to move</p>
+          <p>Eat the red apples to grow and score points</p>
+          <p>Don't hit the walls or yourself!</p>
+          <button class="start-button js-start-button">Start Game</button>
+        </div>
+        
+        <div class="game-over-screen js-game-over-screen" style="display: none;">
+          <h2>Game Over!</h2>
+          <p class="js-final-score">Final Score: 0</p>
+          <p class="js-high-score-message"></p>
+          <button class="restart-button js-restart-button">Play Again</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-info">
+      <h3>Controls:</h3>
+      <div class="controls-grid">
+        <div class="control-item">
+          <span class="key">↑ or W</span>
+          <span class="action">Move Up</span>
+        </div>
+        <div class="control-item">
+          <span class="key">↓ or S</span>
+          <span class="action">Move Down</span>
+        </div>
+        <div class="control-item">
+          <span class="key">← or A</span>
+          <span class="action">Move Left</span>
+        </div>
+        <div class="control-item">
+          <span class="key">→ or D</span>
+          <span class="action">Move Right</span>
+        </div>
+        <div class="control-item">
+          <span class="key">Space</span>
+          <span class="action">Pause/Resume</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="difficulty-info">
+      <h3>Difficulty Levels:</h3>
+      <div class="difficulty-grid">
+        <div class="difficulty-item">
+          <span class="difficulty-name easy">Easy</span>
+          <span class="difficulty-desc">Slower snake, more time to think</span>
+        </div>
+        <div class="difficulty-item">
+          <span class="difficulty-name medium">Medium</span>
+          <span class="difficulty-desc">Balanced speed and challenge</span>
+        </div>
+        <div class="difficulty-item">
+          <span class="difficulty-name hard">Hard</span>
+          <span class="difficulty-desc">Fast snake, quick reflexes needed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script/snake-game.js"></script>
+</body>
+</html>
