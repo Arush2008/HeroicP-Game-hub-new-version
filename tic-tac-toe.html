@@ -10,7 +10,7 @@
   <div class="container">
     <div class="header">
       <h1>Tic Tac Toe</h1>
-      <button class="back-button" onclick="goHome()">← Back to Games</button>
+      <button class="back-button" onclick="goHome()">Back to Games →</button>
     </div>
 
     <div class="game-container">
@@ -82,23 +82,29 @@
         
         <div class="notebook-page">
           <div class="paper-lines"></div>
-          <div class="game-board js-board">
-            <div class="cell js-cell" data-index="0"></div>
-            <div class="cell js-cell" data-index="1"></div>
-            <div class="cell js-cell" data-index="2"></div>
-            <div class="cell js-cell" data-index="3"></div>
-            <div class="cell js-cell" data-index="4"></div>
-            <div class="cell js-cell" data-index="5"></div>
-            <div class="cell js-cell" data-index="6"></div>
-            <div class="cell js-cell" data-index="7"></div>
-            <div class="cell js-cell" data-index="8"></div>
-          </div>
+        <div class="game-board js-board">
+          <div class="cell js-cell" data-index="0"></div>
+          <div class="cell js-cell" data-index="1"></div>
+          <div class="cell js-cell" data-index="2"></div>
+          <div class="cell js-cell" data-index="3"></div>
+          <div class="cell js-cell" data-index="4"></div>
+          <div class="cell js-cell" data-index="5"></div>
+          <div class="cell js-cell" data-index="6"></div>
+          <div class="cell js-cell" data-index="7"></div>
+          <div class="cell js-cell" data-index="8"></div>
         </div>
-        
-        <div class="game-controls">
+        <div class="game-controls-inside">
           <button class="control-button js-new-game" onclick="newGame()">New Game</button>
           <button class="control-button js-back-to-modes-game" onclick="backToModes()">Change Mode</button>
         </div>
+        </div>
+        
+    <!-- Controls section moved below the game square -->
+    <div class="controls no-box">
+      <span class="control-key">Click</span> on cells to make your move
+      <span class="divider">|</span>
+      <span class="control-key">Online</span> mode requires internet connection
+    </div>
       </div>
 
       <!-- Game Over Screen -->
@@ -111,9 +117,7 @@
       </div>
     </div>
 
-    <div class="controls">
-      <p>Click on cells to make your move | Online mode requires internet connection</p>
-    </div>
+    <!-- Controls moved below the game square -->
   </div>
 
   <footer class="footer">

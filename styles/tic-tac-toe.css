@@ -1,3 +1,4 @@
+/* ...existing code... */
 * {
   margin: 0;
   padding: 0;
@@ -122,7 +123,7 @@ body::after {
   cursor: pointer;
   transition: all 0.3s ease;
   position: absolute;
-  left: 0;
+  right: 0;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -131,6 +132,50 @@ body::after {
   border-color: rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+/* Game controls inside the notebook page */
+.game-controls-inside {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+/* Controls section like hub */
+.controls {
+  text-align: center;
+  margin-top: 18px;
+  margin-bottom: 0;
+  padding: 0;
+  font-size: 1rem;
+  color: #444;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.2px;
+  opacity: 0.95;
+}
+.controls.no-box {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+.control-key {
+  background: #f5f5f0;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 2px 10px;
+  font-size: 0.97em;
+  font-weight: 500;
+  margin: 0 4px;
+  color: #222;
+  box-shadow: none;
+  font-family: inherit;
+}
+.divider {
+  margin: 0 10px;
+  color: #bbb;
+  font-weight: 400;
 }
 
 .game-container {
