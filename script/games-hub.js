@@ -12,6 +12,9 @@ function playGame(gameType) {
     case 'snake':
       window.location.href = 'snake-game.html';
       break;
+    case 'tic-tac-toe':
+      window.location.href = 'tic-tac-toe.html';
+      break;
     default:
       alert('Game coming soon!');
   }

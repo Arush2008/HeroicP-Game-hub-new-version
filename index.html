@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeroicP Games Hub</title>
+  <link rel="stylesheet" href="styles/games-hub.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1 class="main-title">HeroicP Games Hub (new version)</h1>
+      <p class="subtitle">Choose your adventure from our collection of games</p>
+    </header>
+
+    <main class="games-grid">
+      <div class="game-card" data-game="rock-paper-scissors">
+        <div class="game-icon">🎮</div>
+        <h2 class="game-title">Rock Paper Scissors</h2>
+        <p class="game-description">Classic hand game with beautiful animations and score tracking</p>
+        <div class="game-features">
+          <span class="feature">Auto Play</span>
+          <span class="feature">Score Tracking</span>
+          <span class="feature">Keyboard Controls</span>
+        </div>
+        <button class="play-button" onclick="playGame('rock-paper-scissors')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="flappy-bird">
+        <div class="game-icon">🐦</div>
+        <h2 class="game-title">Flappy Bird</h2>
+        <p class="game-description">Navigate through pipes in this addictive side-scrolling adventure</p>
+        <div class="game-features">
+          <span class="feature">High Score</span>
+          <span class="feature">Smooth Physics</span>
+          <span class="feature">Endless Gameplay</span>
+        </div>
+        <button class="play-button" onclick="playGame('flappy-bird')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="doodle-jump">
+        <div class="game-icon">🦘</div>
+        <h2 class="game-title">Doodle Jump</h2>
+        <p class="game-description">Jump your way to the top in this gravity-defying platformer</p>
+        <div class="game-features">
+          <span class="feature">Power-ups</span>
+          <span class="feature">Moving Platforms</span>
+          <span class="feature">Endless Heights</span>
+        </div>
+        <button class="play-button" onclick="playGame('doodle-jump')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="snake">
+        <div class="game-icon">🐍</div>
+        <h2 class="game-title">Snake Game</h2>
+        <p class="game-description">Guide the snake to eat apples and grow bigger without hitting walls or yourself</p>
+        <div class="game-features">
+          <span class="feature">3 Difficulty Levels</span>
+          <span class="feature">High Score</span>
+          <span class="feature">Classic Gameplay</span>
+        </div>
+        <button class="play-button" onclick="playGame('snake')">Play Now</button>
+      </div>
+
+      <div class="game-card" data-game="tic-tac-toe">
+        <div class="game-icon">⭕</div>
+        <h2 class="game-title">Tic Tac Toe</h2>
+        <p class="game-description">Classic strategy game with notebook paper theme and multiple game modes</p>
+        <div class="game-features">
+          <span class="feature">Unbeatable AI Bot</span>
+          <span class="feature">Local Multiplayer</span>
+          <span class="feature">Online Multiplayer</span>
+        </div>
+        <button class="play-button" onclick="playGame('tic-tac-toe')">Play Now</button>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>&copy; 2025 HeroicP. All rights reserved.</p>
+      <p class="footer-subtitle">Crafted with ❤️ for gaming enthusiasts</p>
+    </footer>
+  </div>
+
+  <script src="script/games-hub.js"></script>
+</body>
+</html>
