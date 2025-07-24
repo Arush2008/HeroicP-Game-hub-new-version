@@ -114,6 +114,7 @@ body {
   position: absolute;
   right: 0;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: block; 
 }
 
 .back-button:hover {
@@ -121,6 +122,7 @@ body {
   border-color: rgba(0, 0, 0, 0.3);
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: block; 
 }
 /* Game controls inside the notebook page */
 .game-controls-inside {
@@ -633,6 +635,188 @@ body {
     flex-direction: column;
     gap: 20px;
     position: relative;
+  }
+  
+  .back-button {
+    position: static;
+    align-self: flex-start;
+  }
+  
+  .header h1 {
+    font-size: 2.5rem;
+  }
+  
+  .mode-options, .online-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .mode-button, .online-button {
+    padding: 25px 15px;
+  }
+  
+  .game-board {
+    max-width: 250px;
+  }
+  
+  .cell {
+    font-size: 2.5rem;
+  }
+  
+  .notebook-page {
+    padding: 25px;
+  }
+  
+  .game-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .player-info {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .code-display {
+    font-size: 2rem;
+    letter-spacing: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header h1 {
+    font-size: 2rem;
+  }
+  
+  .mode-selection h2, .online-setup h2, .game-over h2 {
+    font-size: 2rem;
+  }
+  
+  .game-board {
+    max-width: 200px;
+  }
+  
+  .cell {
+    font-size: 2rem;
+  }
+  
+  .notebook-page {
+    padding: 20px;
+  }
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Background & Fonts */
+body {
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.12) 1px, transparent 1px),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.09) 1px, transparent 1px),
+    radial-gradient(circle at 40% 80%, rgba(255,255,255,0.10) 1px, transparent 1px),
+    radial-gradient(circle at 60% 20%, rgba(255,255,255,0.07) 1px, transparent 1px),
+    linear-gradient(145deg, #fdfdfb 0%, #f7f6f2 30%, #f9f8f4 60%, #f6f5f0 100%);
+  background-size: 
+    200px 200px,
+    300px 300px,
+    250px 250px,
+    180px 180px,
+    100% 100%;
+  color: #333;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* Header with flexbox */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+}
+
+/* Back Button - fully clickable */
+.back-button {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  color: #333;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  text-align: center;
+  white-space: nowrap; /* prevent line breaks */
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Other styles from your original CSS below (unchanged) */
+/* ... */
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInUp 1s ease-out 0.3s both;
+}
+
+/* Mode Selection Styles */
+.mode-selection {
+  text-align: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+/* ... (Rest of your CSS here, unchanged) ... */
+
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 20px;
+  margin-top: 40px;
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+  opacity: 0.7;
+  color: #333;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px 15px;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 20px;
   }
   
   .back-button {
