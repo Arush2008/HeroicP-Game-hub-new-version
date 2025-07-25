@@ -15,6 +15,8 @@ function playGame(gameType) {
     case 'tic-tac-toe':
       window.location.href = 'tic-tac-toe.html';
       break;
+    case 'car-race':
+      window.location.href = 'car-race.html';
     default:
       alert('Game coming soon!');
   }

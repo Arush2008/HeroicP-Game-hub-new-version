@@ -2,128 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tic Tac Toe - HeroicP Games Hub</title>
-  <link rel="stylesheet" href="styles/tic-tac-toe.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Car Race - HeroicP Games</title>
+  <link rel="stylesheet" href="styles/car-race.css" />
 </head>
 <body>
-  <div class="container">
+  <div class="game-container">
     <div class="header">
-      <h1>Tic Tac Toe</h1>
+      <h1>Car Race</h1>
       <button class="back-button" onclick="goHome()">← Back to Games</button>
     </div>
 
-    <div class="game-container">
-      <!-- Game Mode Selection Screen -->
-      <div class="mode-selection js-mode-selection">
-        <h2>Choose Game Mode</h2>
-        <div class="mode-options">
-          <button class="mode-button js-bot-mode" onclick="selectMode('bot')">
-            <div class="mode-icon">🤖</div>
-            <h3>VS Bot</h3>
-            <p>Challenge our unbeatable AI</p>
-          </button>
-          
-          <button class="mode-button js-local-mode" onclick="selectMode('local')">
-            <div class="mode-icon">👥</div>
-            <h3>Local Multiplayer</h3>
-            <p>Play with a friend on same computer</p>
-          </button>
-        </div>
-      </div>
-
-      <!-- Online Setup Screen -->
-      <div class="online-setup js-online-setup" style="display: none;">
-        <h2>Online Multiplayer</h2>
-        <div class="online-options">
-          <button class="online-button js-create-room" onclick="createRoom()">
-            <h3>Create Room</h3>
-            <p>Generate a code to share</p>
-          </button>
-          
-          <button class="online-button js-join-room" onclick="showJoinRoom()">
-            <h3>Join Room</h3>
-            <p>Enter your friend's code</p>
-          </button>
-        </div>
-        
-        <div class="room-interface js-room-interface" style="display: none;">
-          <div class="room-code js-room-code-display" style="display: none;">
-            <h3>Room Code:</h3>
-            <div class="code-display js-code">XXXX</div>
-            <p>Share this code with your friend</p>
-            <div class="waiting js-waiting">Waiting for opponent...</div>
-          </div>
-          
-          <div class="join-input js-join-input" style="display: none;">
-            <h3>Enter Room Code:</h3>
-            <input type="text" class="code-input js-code-input" placeholder="Enter 4-digit code" maxlength="4">
-            <button class="join-button js-join-button" onclick="joinRoom()">Join Game</button>
-          </div>
-        </div>
-        
-        <button class="back-to-modes js-back-to-modes" onclick="backToModes()">← Back to Game Modes</button>
-      </div>
-
-      <!-- Game Board -->
-      <div class="game-board-container js-game-board" style="display: none;">
-        <div class="game-info">
-          <div class="player-info js-player-info">
-            <span class="current-player js-current-player">Player X's Turn</span>
-            <span class="game-mode js-game-mode-display"></span>
-          </div>
-        </div>
-        
-        <div class="notebook-page">
-          <div class="paper-lines"></div>
-        <div class="game-board js-board">
-          <div class="cell js-cell" data-index="0"></div>
-          <div class="cell js-cell" data-index="1"></div>
-          <div class="cell js-cell" data-index="2"></div>
-          <div class="cell js-cell" data-index="3"></div>
-          <div class="cell js-cell" data-index="4"></div>
-          <div class="cell js-cell" data-index="5"></div>
-          <div class="cell js-cell" data-index="6"></div>
-          <div class="cell js-cell" data-index="7"></div>
-          <div class="cell js-cell" data-index="8"></div>
-        </div>
-        <div class="game-controls-inside">
-          <button class="control-button js-new-game" onclick="newGame()">New Game</button>
-          <button class="control-button js-back-to-modes-game" onclick="backToModes()">Change Mode</button>
-        </div>
-        </div>
-        
-    <!-- Controls section moved below the game square -->
-    <div class="controls no-box">
-      <span class="control-key">Click</span> on cells to make your move
-      <span class="divider">|</span>
-      <span class="control-key">Online</span> mode requires internet connection
+    <div class="mode-select" style="margin-bottom: 20px; text-align:center;">
+      <label for="mode" style="font-weight:bold;">Mode:</label>
+      <select id="mode" style="padding:6px 12px; border-radius:8px; font-size:1rem;">
+        <option value="2p">2 Player</option>
+        <option value="solo">Solo</option>
+      </select>
     </div>
+
+    <div class="game-area">
+      <!-- Road lines and middle border -->
+      <div class="road-lines" id="roadLines">
+        <div class="lane-line" style="left: 16.66%;"></div>
+        <div class="lane-line" style="left: 33.33%;"></div>
+        <div class="middle-border"></div>
+        <div class="lane-line" style="left: 66.66%;"></div>
+        <div class="lane-line" style="left: 83.33%;"></div>
+      </div>
+      <!-- Player cars -->
+      <div class="car player1"></div>
+      <div class="car player2"></div>
+
+      <!-- SOLO TOP BAR: Score | Time | Highest -->
+      <div class="solo-topbar">
+        <div id="solo-scoreboard" class="solo-box">
+          Score: <span id="soloScore">0</span>
+        </div>
+        <div class="game-ui solo-box">
+          <div class="score">Time: <span id="lapTime">0.00s</span></div>
+        </div>
+        <div id="solo-highscore" class="solo-box">
+          Highest: <span id="soloHighScore">0</span>
+        </div>
       </div>
 
-      <!-- Game Over Screen -->
-      <div class="game-over js-game-over" style="display: none;">
-        <h2 class="js-winner-text">Game Over!</h2>
-        <div class="game-over-options">
-          <button class="control-button js-play-again" onclick="playAgain()">Play Again</button>
-          <button class="control-button js-back-to-modes-over" onclick="backToModes()">Change Mode</button>
-        </div>
+      <!-- 2P Time (fallback for 2p mode, only time box left) -->
+      <div class="game-ui two-p-ui">
+        <div class="score">Time: <span id="lapTime">0.00s</span></div>
+      </div>
+
+      <div class="game-over" id="gameOver" style="display: none;">
+        <h2>Race Over!</h2>
+        <p><span id="finalPosition">Player crashed!</span></p>
+        <p><em>Press SPACE or click to race again</em></p>
+        <button class="restart-button" onclick="restartGame()">Race Again</button>
+        <button class="home-button" onclick="goHome()">Back to Games</button>
+      </div>
+
+      <div class="start-screen" id="startScreen">
+        <h2>Ready to Race?</h2>
+        <p>Player 1 (Red): Use <b>A</b>/<b>D</b> to move</p>
+        <p id="player2-controls">Player 2 (Yellow): Use <b>←</b>/<b>→</b> to move</p>
+        <p id="solo-info" style="display:none;">Solo: Use <b>A</b>/<b>D</b> or <b>←</b>/<b>→</b> to move. Only 3 lanes!</p>
+        <p>Avoid obstacles and don't cross the middle line!</p>
+        <p><em>Press SPACE or click to start!</em></p>
+        <button class="start-button" onclick="startGame()">Start Race</button>
       </div>
     </div>
 
-    <!-- Controls moved below the game square -->
+    <div class="controls">
+      <p id="controls-text">
+        Controls: Player 1 - A/D | Player 2 - ←/→ | SPACE or Click to start/restart
+      </p>
+    </div>
   </div>
 
   <footer class="footer">
     <p>&copy; 2025 HeroicP. All rights reserved.</p>
   </footer>
 
-  <script src="script/tic-tac-toe.js"></script>
-  <script>
-    function goHome() {
-      // Update this URL to your actual games hub or home page
-      window.location.href = "index.html";
-    }
-  </script>
+  <script src="script/car-race.js"></script>
 </body>
 </html>
