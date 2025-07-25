@@ -5,7 +5,7 @@
 }
 
 body {
-  background: linear-gradient(135deg, #FF6B9D 0%, #C44569 50%, #FF6B9D 100%);
+  background: linear-gradient(135deg, #1317ff 0%, #2bcdff 50%, #1fffbf 100%);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   min-height: 100vh;
   display: flex;
@@ -33,7 +33,7 @@ body {
 .header h1 {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #FFD700;
+  color: #15ff00;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -82,7 +82,7 @@ body {
   box-sizing: border-box;
   text-align: center;
   background: rgba(0,0,0,0.5);
-  color: #FFD700;
+  color: #40ff00;
   font-size: 1.2rem;
   font-weight: bold;
   border-radius: 12px;
@@ -185,7 +185,7 @@ body {
 }
 
 .player1 {
-  background: #e74c3c;
+  background: #ff1900;
   border: 3px solid #fff;
 }
 
@@ -227,7 +227,7 @@ body {
 .game-over h2, .start-screen h2 {
   font-size: 2rem;
   margin-bottom: 20px;
-  color: #FFD700;
+  color: #52ff3c;
 }
 
 .game-over p, .start-screen p {
@@ -253,11 +253,11 @@ body {
 }
 
 .home-button {
-  background: linear-gradient(145deg, #48dbfb, #0abde3);
+  background: linear-gradient(145deg, #31fdc7, #0abde3);
 }
 
 .start-button {
-  background: linear-gradient(145deg, #feca57, #ff9f43);
+  background: linear-gradient(145deg, #0dff00, #234af8);
 }
 
 .restart-button:hover, .home-button:hover, .start-button:hover {
@@ -348,7 +348,7 @@ body {
   box-shadow: 0 0 8px #ff6b9d44;
 }
 .mode-select label {
-  color: #FFD700;
+  color: #00ff3c;
   font-size: 1.1rem;
   margin-right: 8px;
 }
