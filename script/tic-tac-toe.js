@@ -7,6 +7,9 @@ let isOnlineGame = false;
 let roomCode = '';
 let isHost = false;
 let opponentConnected = false;
+let botStarts = false; // Track if bot starts this round
+let playerMark = 'X';  // Always player is X
+let botMark = 'O';     // Always bot is O
 
 // Winning combinations
 const winningCombinations = [
@@ -152,7 +155,19 @@ function generateRoomCode() {
 function startGame(mode) {
   gameMode = mode;
   gameActive = true;
-  currentPlayer = 'X';
+
+  // Always keep player as 'X' and bot as 'O'
+  playerMark = 'X';
+  botMark = 'O';
+
+  // Alternate starter if playing vs bot
+  if (mode === 'bot') {
+    botStarts = !botStarts;
+    currentPlayer = botStarts ? botMark : playerMark;
+  } else {
+    currentPlayer = 'X';
+  }
+
   gameBoard = ['', '', '', '', '', '', '', '', ''];
   
   hideAllScreens();
@@ -175,6 +190,11 @@ function startGame(mode) {
       break;
   }
   gameModeDisplay.textContent = modeText;
+
+  // If bot starts, make bot move immediately
+  if (mode === 'bot' && currentPlayer === botMark) {
+    setTimeout(makeBotMove, 500);
+  }
 }
 
 function makeMove(index) {
@@ -188,13 +208,22 @@ function makeMove(index) {
       return; // Not player's turn
     }
   }
+
+  // For bot mode, only allow player to move on their mark
+  if (gameMode === 'bot' && currentPlayer !== playerMark) {
+    return;
+  }
   
   // Make the move
   gameBoard[index] = currentPlayer;
   updateCell(index, currentPlayer);
   
   if (checkWin()) {
-    endGame(`Player ${currentPlayer} Wins!`);
+    if (gameMode === 'bot') {
+      endGame(currentPlayer === playerMark ? 'You Win!' : 'AI Bot Wins! Better luck next time!');
+    } else {
+      endGame(`Player ${currentPlayer} Wins!`);
+    }
     return;
   }
   
@@ -208,7 +237,7 @@ function makeMove(index) {
   updateDisplay();
   
   // Bot move for single player mode
-  if (gameMode === 'bot' && currentPlayer === 'O' && gameActive) {
+  if (gameMode === 'bot' && currentPlayer === botMark && gameActive) {
     setTimeout(makeBotMove, 500);
   }
   
@@ -222,13 +251,13 @@ function makeBotMove() {
   if (!gameActive) return;
   
   // Unbeatable AI using minimax algorithm
-  const bestMove = getBestMove();
+  const bestMove = getBestMove(botMark, playerMark);
   if (bestMove !== -1) {
-    gameBoard[bestMove] = 'O';
-    updateCell(bestMove, 'O');
+    gameBoard[bestMove] = botMark;
+    updateCell(bestMove, botMark);
     
     if (checkWin()) {
-      endGame('AI Bot Wins! Better luck next time!');
+      endGame(botMark === playerMark ? 'You Win!' : 'AI Bot Wins! Better luck next time!');
       return;
     }
     
@@ -237,50 +266,20 @@ function makeBotMove() {
       return;
     }
     
-    currentPlayer = 'X';
-    updateDisplay();
-  }
-}
-
-function simulateOnlineOpponentMove() {
-  if (!gameActive) return;
-  if ((isHost && currentPlayer === 'X') || (!isHost && currentPlayer === 'O')) {
-    return; // It's still player's turn
-  }
-  
-  // Simulate opponent move (random available move)
-  const availableMoves = gameBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
-  
-  if (availableMoves.length > 0) {
-    const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
-    gameBoard[randomMove] = currentPlayer;
-    updateCell(randomMove, currentPlayer);
-    
-    if (checkWin()) {
-      const winner = isHost ? (currentPlayer === 'X' ? 'You' : 'Opponent') : (currentPlayer === 'O' ? 'You' : 'Opponent');
-      endGame(`${winner} Win!`);
-      return;
-    }
-    
-    if (checkDraw()) {
-      endGame("It's a Draw!");
-      return;
-    }
-    
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    currentPlayer = playerMark;
     updateDisplay();
   }
 }
 
 // Minimax algorithm for unbeatable AI
-function getBestMove() {
+function getBestMove(ai, human) {
   let bestScore = -Infinity;
   let bestMove = -1;
   
   for (let i = 0; i < 9; i++) {
     if (gameBoard[i] === '') {
-      gameBoard[i] = 'O';
-      let score = minimax(gameBoard, 0, false);
+      gameBoard[i] = ai;
+      let score = minimax(gameBoard, 0, false, ai, human);
       gameBoard[i] = '';
       
       if (score > bestScore) {
@@ -293,19 +292,19 @@ function getBestMove() {
   return bestMove;
 }
 
-function minimax(board, depth, isMaximizing) {
+function minimax(board, depth, isMaximizing, ai, human) {
   const winner = checkWinnerForMinimax(board);
   
-  if (winner === 'O') return 1;
-  if (winner === 'X') return -1;
+  if (winner === ai) return 1;
+  if (winner === human) return -1;
   if (board.every(cell => cell !== '')) return 0;
   
   if (isMaximizing) {
     let bestScore = -Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === '') {
-        board[i] = 'O';
-        let score = minimax(board, depth + 1, false);
+        board[i] = ai;
+        let score = minimax(board, depth + 1, false, ai, human);
         board[i] = '';
         bestScore = Math.max(score, bestScore);
       }
@@ -315,8 +314,8 @@ function minimax(board, depth, isMaximizing) {
     let bestScore = Infinity;
     for (let i = 0; i < 9; i++) {
       if (board[i] === '') {
-        board[i] = 'X';
-        let score = minimax(board, depth + 1, true);
+        board[i] = human;
+        let score = minimax(board, depth + 1, true, ai, human);
         board[i] = '';
         bestScore = Math.min(score, bestScore);
       }
@@ -346,7 +345,7 @@ function updateDisplay() {
   
   switch (gameMode) {
     case 'bot':
-      displayText = currentPlayer === 'X' ? "Your Turn" : "AI Bot's Turn";
+      displayText = currentPlayer === playerMark ? "Your Turn" : "AI Bot's Turn";
       break;
     case 'local':
       displayText = `Player ${currentPlayer}'s Turn`;
@@ -417,6 +416,37 @@ function backToModes() {
 // Navigation function
 function goHome() {
   window.location.href = 'index.html';
+}
+
+// Simulate online opponent move (unchanged)
+function simulateOnlineOpponentMove() {
+  if (!gameActive) return;
+  if ((isHost && currentPlayer === 'X') || (!isHost && currentPlayer === 'O')) {
+    return; // It's still player's turn
+  }
+  
+  // Simulate opponent move (random available move)
+  const availableMoves = gameBoard.map((cell, index) => cell === '' ? index : null).filter(val => val !== null);
+  
+  if (availableMoves.length > 0) {
+    const randomMove = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+    gameBoard[randomMove] = currentPlayer;
+    updateCell(randomMove, currentPlayer);
+    
+    if (checkWin()) {
+      const winner = isHost ? (currentPlayer === 'X' ? 'You' : 'Opponent') : (currentPlayer === 'O' ? 'You' : 'Opponent');
+      endGame(`${winner} Win!`);
+      return;
+    }
+    
+    if (checkDraw()) {
+      endGame("It's a Draw!");
+      return;
+    }
+    
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+    updateDisplay();
+  }
 }
 
 // Initialize the game when page loads
