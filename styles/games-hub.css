@@ -1,3 +1,8 @@
+/* ===========================
+   HeroicP Games Hub - Main Styles
+   =========================== */
+
+/* --- General Reset and Body Styles --- */
 * {
   margin: 0;
   padding: 0;
@@ -14,11 +19,13 @@ body {
   overflow-x: hidden;
 }
 
+/* --- Animated Gradient Background --- */
 @keyframes gradientMove {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
 }
 
+/* --- Container and Header --- */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -59,6 +66,9 @@ body {
   font-weight: 300;
 }
 
+/* ===========================
+   Game Cards Grid
+   =========================== */
 .games-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -68,6 +78,9 @@ body {
   animation: fadeInUp 1s ease-out 0.3s both;
 }
 
+/* ===========================
+   Game Card - General Styles
+   =========================== */
 .game-card {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
@@ -82,6 +95,7 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Card Hover Animation --- */
 .game-card::before {
   content: '';
   position: absolute;
@@ -112,6 +126,7 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* --- Game Icon Animation --- */
 .game-icon {
   font-size: 4rem;
   margin-bottom: 20px;
@@ -124,11 +139,13 @@ body {
   60% { transform: translateY(-5px); }
 }
 
+/* --- Per-Card Icon Animation Delay (for visual variety) --- */
 .game-card:nth-child(1) .game-icon { animation-delay: 0s; }
 .game-card:nth-child(2) .game-icon { animation-delay: 0.5s; }
 .game-card:nth-child(3) .game-icon { animation-delay: 1s; }
 .game-card:nth-child(4) .game-icon { animation-delay: 1.5s; }
 
+/* --- Game Card Content --- */
 .game-title {
   font-size: 1.8rem;
   font-weight: bold;
@@ -162,6 +179,9 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+/* ===========================
+   Play Button Styles
+   =========================== */
 .play-button {
   background: linear-gradient(145deg, #ff6b6b, #ee5a52);
   border: none;
@@ -204,27 +224,32 @@ body {
   transform: translateY(0);
 }
 
+/* --- Per-Game Play Button Colors --- */
+/* Rock Paper Scissors (first card) uses default above */
 
+/* Flappy Bird (second card) */
 .game-card:nth-child(2) .play-button {
   background: linear-gradient(145deg, #48dbfb, #0abde3);
   box-shadow: 0 4px 15px rgba(72, 219, 251, 0.3);
 }
-
 .game-card:nth-child(2) .play-button:hover {
   background: linear-gradient(145deg, #0abde3, #48dbfb);
   box-shadow: 0 6px 20px rgba(72, 219, 251, 0.4);
 }
 
+/* Tic Tac Toe (third card) */
 .game-card:nth-child(3) .play-button {
   background: linear-gradient(145deg, #feca57, #ff9f43);
   box-shadow: 0 4px 15px rgba(254, 202, 87, 0.3);
 }
-
 .game-card:nth-child(3) .play-button:hover {
   background: linear-gradient(145deg, #ff9f43, #feca57);
   box-shadow: 0 6px 20px rgba(254, 202, 87, 0.4);
 }
 
+/* ===========================
+   Footer
+   =========================== */
 footer {
   text-align: center;
   padding: 20px;
@@ -233,6 +258,9 @@ footer {
   margin-top: 100px;
 }
 
+/* ===========================
+   Animations
+   =========================== */
 @keyframes fadeInDown {
   from {
     opacity: 0;
@@ -255,6 +283,9 @@ footer {
   }
 }
 
+/* ===========================
+   Responsive Design
+   =========================== */
 @media (max-width: 768px) {
   .main-title {
     font-size: 2.5rem;
@@ -301,6 +332,7 @@ footer {
   }
 }
 
+/* --- Touch Devices: Remove Hover Effects --- */
 @media (hover: none) and (pointer: coarse) {
   .game-card:hover {
     transform: none;
